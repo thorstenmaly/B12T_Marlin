@@ -55,6 +55,11 @@ const tTimerConfig timer_config[NUM_HARDWARE_TIMERS] = {
 void IRAM_ATTR timer_isr(void *para) {
   const tTimerConfig& timer = timer_config[(int)para];
 
+  #if CONFIG_IDF_TARGET_ESP32S3
+    timer_group_clr_intr_status_in_isr(timer.group, timer.idx);
+    timer.fn();
+    timer_group_enable_alarm_in_isr(timer.group, timer.idx);
+  #else
   // Retrieve the interrupt status and the counter value
   // from the timer that reported the interrupt
   uint32_t intr_status = TG[timer.group]->int_st_timers.val;
@@ -74,6 +79,7 @@ void IRAM_ATTR timer_isr(void *para) {
   // After the alarm has been triggered
   // Enable it again so it gets triggered the next time
   TG[timer.group]->hw_timer[timer.idx].config.alarm_en = TIMER_ALARM_EN;
+  #endif
 }
 
 /**
@@ -84,13 +90,17 @@ void IRAM_ATTR timer_isr(void *para) {
 void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
   const tTimerConfig timer = timer_config[timer_num];
 
-  timer_config_t config;
+  timer_config_t config = {};
   config.divider     = timer.divider;
   config.counter_dir = TIMER_COUNT_UP;
   config.counter_en  = TIMER_PAUSE;
   config.alarm_en    = TIMER_ALARM_EN;
   config.intr_type   = TIMER_INTR_LEVEL;
-  config.auto_reload = true;
+  #if CONFIG_IDF_TARGET_ESP32S3
+    config.auto_reload = TIMER_AUTORELOAD_EN;
+  #else
+    config.auto_reload = true;
+  #endif
 
   // Select and initialize the timer
   timer_init(timer.group, timer.idx, &config);
@@ -150,6 +160,10 @@ hal_timer_t HAL_timer_get_count(const uint8_t timer_num) {
  * @param timer_num timer number to enable interrupts on
  */
 void HAL_timer_enable_interrupt(const uint8_t timer_num) {
+  #if CONFIG_IDF_TARGET_ESP32S3
+    const tTimerConfig timer = timer_config[timer_num];
+    timer_enable_intr(timer.group, timer.idx);
+  #endif
   //const tTimerConfig timer = timer_config[timer_num];
   //timer_enable_intr(timer.group, timer.idx);
 }
@@ -159,13 +173,21 @@ void HAL_timer_enable_interrupt(const uint8_t timer_num) {
  * @param timer_num timer number to disable interrupts on
  */
 void HAL_timer_disable_interrupt(const uint8_t timer_num) {
+  #if CONFIG_IDF_TARGET_ESP32S3
+    const tTimerConfig timer = timer_config[timer_num];
+    timer_disable_intr(timer.group, timer.idx);
+  #endif
   //const tTimerConfig timer = timer_config[timer_num];
   //timer_disable_intr(timer.group, timer.idx);
 }
 
 bool HAL_timer_interrupt_enabled(const uint8_t timer_num) {
   const tTimerConfig timer = timer_config[timer_num];
-  return TG[timer.group]->int_ena.val | BIT(timer_num);
+  #if CONFIG_IDF_TARGET_ESP32S3
+    return (TG[timer.group]->int_ena_timers.val & BIT(timer.idx)) != 0;
+  #else
+    return (TG[timer.group]->int_ena.val & BIT(timer.idx)) != 0;
+  #endif
 }
 
 #endif // ARDUINO_ARCH_ESP32

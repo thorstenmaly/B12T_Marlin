@@ -1218,7 +1218,7 @@
 
 // @section motion
 
-#define AXIS_RELATIVE_MODES { false, false, false, false }
+#define AXIS_RELATIVE_MODES { false, false, false } // XYZ; no extruder
 
 // Add a Duplicate option for well-separated conjoined nozzles
 //#define MULTI_NOZZLE_DUPLICATION
@@ -3012,7 +3012,7 @@
     #define Z_CURRENT       240
     #define Z_CURRENT_HOME  Z_CURRENT * 2
     #define Z_MICROSTEPS     16
-    #define Z_RSENSE          0.11
+    #define Z_RSENSE          0.10 // ESP32-S3 Mini 1 N8 controller R6 / R7: 100 milliohm
     #define Z_CHAIN_POS      -1
     //#define Z_INTERPOLATE  true
     // #define Z_HOLD_MULTIPLIER 0.5

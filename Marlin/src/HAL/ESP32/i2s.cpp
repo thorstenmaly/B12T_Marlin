@@ -23,7 +23,7 @@
 
 #include "../../inc/MarlinConfigPre.h"
 
-#if DISABLED(USE_ESP32_EXIO)
+#if ENABLED(I2S_STEPPER_STREAM) && DISABLED(USE_ESP32_EXIO)
 
 #include "i2s.h"
 

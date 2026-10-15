@@ -138,7 +138,7 @@ void MarlinHAL::init_board() {
   // The following code initializes hardware Serial1 and Serial2 to use user-defined pins
   // if they have been defined.
   #if defined(HARDWARE_SERIAL1_RX) && defined(HARDWARE_SERIAL1_TX)
-    HardwareSerial Serial1(1);
+    // Use the persistent Arduino Serial1 instance.
     #ifdef TMC_BAUD_RATE  // use TMC_BAUD_RATE for Serial1 if defined
       Serial1.begin(TMC_BAUD_RATE, SERIAL_8N1, HARDWARE_SERIAL1_RX, HARDWARE_SERIAL1_TX);
     #else  // use default BAUDRATE if TMC_BAUD_RATE not defined
@@ -146,7 +146,7 @@ void MarlinHAL::init_board() {
     #endif
   #endif
   #if defined(HARDWARE_SERIAL2_RX) && defined(HARDWARE_SERIAL2_TX)
-    HardwareSerial Serial2(2);
+    // Use the persistent Arduino Serial2 instance (also used by TMCStepper).
     #ifdef TMC_BAUD_RATE  // use TMC_BAUD_RATE for Serial1 if defined
       Serial2.begin(TMC_BAUD_RATE, SERIAL_8N1, HARDWARE_SERIAL2_RX, HARDWARE_SERIAL2_TX);
     #else  // use default BAUDRATE if TMC_BAUD_RATE not defined
@@ -212,6 +212,10 @@ int MarlinHAL::freeMemory() { return ESP.getFreeHeap(); }
 #define ADC1_CHANNEL(pin) ADC1_GPIO ## pin ## _CHANNEL
 
 adc1_channel_t get_channel(int pin) {
+  #if CONFIG_IDF_TARGET_ESP32S3
+    // S3 ADC1 channels 0..9 are GPIO1..10.
+    return pin >= 1 && pin <= 10 ? adc1_channel_t(pin - 1) : ADC1_CHANNEL_MAX;
+  #else
   switch (pin) {
     case 39: return ADC1_CHANNEL(39);
     case 36: return ADC1_CHANNEL(36);
@@ -221,10 +225,11 @@ adc1_channel_t get_channel(int pin) {
     case 32: return ADC1_CHANNEL(32);
   }
   return ADC1_CHANNEL_MAX;
+  #endif
 }
 
 void adc1_set_attenuation(adc1_channel_t chan, adc_atten_t atten) {
-  if (attenuations[chan] != atten) {
+  if (chan < ADC1_CHANNEL_MAX && attenuations[chan] != atten) {
     adc1_config_channel_atten(chan, atten);
     attenuations[chan] = atten;
   }
@@ -232,7 +237,7 @@ void adc1_set_attenuation(adc1_channel_t chan, adc_atten_t atten) {
 
 void MarlinHAL::adc_init() {
   // Configure ADC
-  adc1_config_width(ADC_WIDTH_12Bit);
+  adc1_config_width(ADC_WIDTH_BIT_12);
 
   // Configure channels only if used as (re-)configuring a pin for ADC that is used elsewhere might have adverse effects
   TERN_(HAS_TEMP_ADC_0,        adc1_set_attenuation(get_channel(TEMP_0_PIN), ADC_ATTEN_11db));
@@ -268,6 +273,7 @@ void MarlinHAL::adc_init() {
 
 void MarlinHAL::adc_start(const pin_t pin) {
   const adc1_channel_t chan = get_channel(pin);
+  if (chan >= ADC1_CHANNEL_MAX) { adc_result = 0; return; }
   uint32_t mv;
   esp_adc_cal_get_voltage((adc_channel_t)chan, &characteristics[attenuations[chan]], &mv);
 

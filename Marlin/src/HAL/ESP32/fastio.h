@@ -45,11 +45,16 @@
   #define READ(IO)                digitalRead(IO)
   // Write to a pin wrapper
   #define WRITE(IO, v)            (IO >= 100 ? Write_EXIO(IO, v) : digitalWrite(IO, v))
-#else
+#elif ENABLED(I2S_STEPPER_STREAM)
   // Read a pin wrapper
   #define READ(IO)                (IS_I2S_EXPANDER_PIN(IO) ? i2s_state(I2S_EXPANDER_PIN_INDEX(IO)) : digitalRead(IO))
   // Write to a pin wrapper
   #define WRITE(IO, v)            (IS_I2S_EXPANDER_PIN(IO) ? i2s_write(I2S_EXPANDER_PIN_INDEX(IO), v) : digitalWrite(IO, v))
+#endif
+
+#if NONE(USE_ESP32_EXIO, I2S_STEPPER_STREAM)
+  #define READ(IO) digitalRead(IO)
+  #define WRITE(IO, v) digitalWrite(IO, v)
 #endif
 
 // Set pin as input wrapper (0x80 | (v << 5) | (IO - 100))
@@ -75,7 +80,12 @@
 #define extDigitalWrite(IO,V)   digitalWrite(IO,V)
 
 // PWM outputs
-#define PWM_PIN(P)              (P < 34 || P > 127) // NOTE Pins >= 34 are input only on ESP32, so they can't be used for output.
+#if CONFIG_IDF_TARGET_ESP32S3
+  #include <driver/gpio.h>
+  #define PWM_PIN(P) GPIO_IS_VALID_OUTPUT_GPIO(P)
+#else
+  #define PWM_PIN(P) (P < 34 || P > 127)
+#endif
 
 // Toggle pin value
 #define TOGGLE(IO)              WRITE(IO, !READ(IO))
@@ -88,6 +98,8 @@
 #define RXD        3
 #define TXD        1
 
-// TWI (I2C)
-#define SCL        5
-#define SDA        4
+// Preserve the original ESP32 mapping. S3 uses its variant if I2C is enabled.
+#if !CONFIG_IDF_TARGET_ESP32S3
+  #define SCL 5
+  #define SDA 4
+#endif

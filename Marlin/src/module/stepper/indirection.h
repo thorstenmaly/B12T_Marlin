@@ -94,11 +94,15 @@ void reset_stepper_drivers();    // Called by settings.load / settings.reset
     #define X_DIR_WRITE(STATE) WRITE(X_DIR_PIN,INVERT_DIR(X, STATE))
     #define X_DIR_READ() INVERT_DIR(X, bool(READ(X_DIR_PIN)))
   #endif
-  #define X_STEP_INIT() SET_OUTPUT(X_STEP_PIN)
+  #ifndef X_STEP_INIT
+    #define X_STEP_INIT() SET_OUTPUT(X_STEP_PIN)
+  #endif
   #ifndef X_STEP_WRITE
     #define X_STEP_WRITE(STATE) WRITE(X_STEP_PIN,STATE)
   #endif
-  #define X_STEP_READ() bool(READ(X_STEP_PIN))
+  #ifndef X_STEP_READ
+    #define X_STEP_READ() bool(READ(X_STEP_PIN))
+  #endif
 #endif
 
 // Y Stepper
@@ -113,11 +117,15 @@ void reset_stepper_drivers();    // Called by settings.load / settings.reset
     #define Y_DIR_WRITE(STATE) WRITE(Y_DIR_PIN,INVERT_DIR(Y, STATE))
     #define Y_DIR_READ() INVERT_DIR(Y, bool(READ(Y_DIR_PIN)))
   #endif
-  #define Y_STEP_INIT() SET_OUTPUT(Y_STEP_PIN)
+  #ifndef Y_STEP_INIT
+    #define Y_STEP_INIT() SET_OUTPUT(Y_STEP_PIN)
+  #endif
   #ifndef Y_STEP_WRITE
     #define Y_STEP_WRITE(STATE) WRITE(Y_STEP_PIN,STATE)
   #endif
-  #define Y_STEP_READ() bool(READ(Y_STEP_PIN))
+  #ifndef Y_STEP_READ
+    #define Y_STEP_READ() bool(READ(Y_STEP_PIN))
+  #endif
 #endif
 
 // Z Stepper

@@ -22,8 +22,19 @@
 
 #ifdef ARDUINO_ARCH_ESP32
 
-#include "FlushableHardwareSerial.h"
+#include "../../inc/MarlinConfig.h"
 
-Serial1Class<FlushableHardwareSerial> flushableSerial(false, 0);
+#if MB(ESP32_S3_MINI_1_N8)
+  // Board pin definitions are available after MarlinConfig.h has finished
+  // loading. The HAL header is included before the board's pins header.
+  void FlushableHardwareSerial::begin(unsigned long baud) {
+    HardwareSerial::begin(baud, SERIAL_8N1, ESP32_HOST_RX_PIN, ESP32_HOST_TX_PIN);
+  }
+
+  Serial1Class<FlushableHardwareSerial> flushableSerial(false, SERIAL_PORT);
+  ForwardSerial1Class<HWCDC> usbSerial(false, Serial);
+#else
+  Serial1Class<FlushableHardwareSerial> flushableSerial(false, 0);
+#endif
 
 #endif

@@ -854,6 +854,8 @@
 // Espressif ESP32
 //
 
+#elif MB(ESP32_S3_MINI_1_N8)
+  #include "esp32/pins_ESP32_S3_MINI_1_N8.h"             // ESP32-S3                             env:esp32_s3_mini_1_n8
 #elif MB(ESPRESSIF_ESP32)
   #include "esp32/pins_ESP32.h"                     // ESP32                                env:esp32
 #elif MB(MRR_ESPA)

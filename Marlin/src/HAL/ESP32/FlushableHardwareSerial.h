@@ -29,6 +29,14 @@
 class FlushableHardwareSerial : public HardwareSerial {
 public:
   FlushableHardwareSerial(int uart_nr) : HardwareSerial(uart_nr) {}
+  #if MB(ESP32_S3_MINI_1_N8)
+    void begin(unsigned long baud);
+  #endif
 };
 
 extern Serial1Class<FlushableHardwareSerial> flushableSerial;
+
+#if MB(ESP32_S3_MINI_1_N8)
+  #include <HWCDC.h>
+  extern ForwardSerial1Class<HWCDC> usbSerial;
+#endif

@@ -52,7 +52,9 @@
 
 #define MYSERIAL1 flushableSerial
 
-#if ENABLED(ESP3D_WIFISUPPORT)
+#if MB(ESP32_S3_MINI_1_N8)
+  #define MYSERIAL2 usbSerial
+#elif ENABLED(ESP3D_WIFISUPPORT)
   typedef ForwardSerial1Class< decltype(Serial2Socket) > DefaultSerial1;
   extern DefaultSerial1 MSerial0;
   #define MYSERIAL2 MSerial0
@@ -66,8 +68,13 @@
 #define HAL_CAN_SET_PWM_FREQ   // This HAL supports PWM Frequency adjustment
 #define PWM_FREQUENCY  1000u   // Default PWM frequency when set_pwm_duty() is called without set_pwm_frequency()
 #define PWM_RESOLUTION   10u   // Default PWM bit resolution
-#define CHANNEL_MAX_NUM  15u   // max PWM channel # to allocate (7 to only use low speed, 15 to use low & high)
-#define MAX_PWM_IOPIN    33u   // hardware pwm pins < 34
+#if CONFIG_IDF_TARGET_ESP32S3
+  #define CHANNEL_MAX_NUM 7u
+  #define MAX_PWM_IOPIN 48u
+#else
+  #define CHANNEL_MAX_NUM 15u
+  #define MAX_PWM_IOPIN 33u
+#endif
 #ifndef MAX_EXPANDER_BITS
   #define MAX_EXPANDER_BITS 32 // I2S expander bit width (max 32)
 #endif
