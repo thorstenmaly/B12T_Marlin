@@ -79,7 +79,7 @@
  *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-#define SERIAL_PORT 1 // AUX1 RX = GPIO13, AUX2 TX = GPIO14
+#define SERIAL_PORT 1 // AUX1 RX = GPIO14, AUX2 TX = GPIO13
 
 /**
  * Serial Port Baud Rate

@@ -61,7 +61,9 @@
 #define Z_SLAVE_ADDRESS 0 // MS1 / MS2 jumpers open (internal pulldowns).
 
 // Host UART1 on J6: AUX1 = RX, AUX2 = TX. USB uses GPIO19 / GPIO20.
-#define ESP32_HOST_RX_PIN 13
-#define ESP32_HOST_TX_PIN 14
+#define AUX1 14
+#define AUX2 13
+#define ESP32_HOST_RX_PIN AUX1
+#define ESP32_HOST_TX_PIN AUX2
 
 // No AS5600, I2C bus, heaters, fans, or extruder outputs are configured.

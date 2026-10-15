@@ -191,7 +191,11 @@ public:
   static void watchdog_init()    IF_DISABLED(USE_WATCHDOG, {});
   static void watchdog_refresh() IF_DISABLED(USE_WATCHDOG, {});
 
-  static void init() {}        // Called early in setup()
+  #if MB(ESP32_S3_MINI_1_N8)
+    static void init();        // Set UART pins before TMC driver initialization
+  #else
+    static void init() {}
+  #endif
   static void init_board();    // Called less early in setup()
   static void reboot();        // Restart the firmware
 

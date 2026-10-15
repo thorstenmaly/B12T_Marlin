@@ -13,7 +13,7 @@ no PSRAM, and the native USB Serial/JTAG interface.
 | Z enable (active low) | 21 |
 | Z DIAG / sensorless home | 16 |
 | TMC2209 UART TX / RX | 17 / 18 |
-| AUX1 G-code RX / AUX2 G-code TX | 13 / 14 |
+| AUX1 G-code RX / AUX2 G-code TX | 14 / 13 |
 | USB D- / D+ | 19 / 20 |
 
 AUX uses UART1 at 115200 baud, 8N1. Connect the host TX to AUX1,
@@ -24,6 +24,9 @@ from both hosts share one motion planner and one position; coordinate the hosts
 so their motion sequences don't interleave unexpectedly.
 
 UART2 configures the TMC2209 independently of both host interfaces.
+Its GPIO18 RX / GPIO17 TX mapping is set in early HAL initialization, before
+Marlin starts the TMC UART. S3 UART2 defaults to GPIO19/20, so allowing a default
+UART2 initialization first would disconnect native USB.
 The driver address is 0: leave the MS1/MS2 jumpers open. The current calculation
 uses the schematic's 0.10 ohm sense resistors. The existing Z settings are
 retained: 240 mA RMS, 16 microsteps, 5249.3438 steps/mm, 4 mm/s maximum,
@@ -54,8 +57,36 @@ The USB PD voltage-selection GPIOs retain their hardware defaults.
 No G-code handler or command syntax has been changed. Hardware operation needs
 validation on the actual board even after a successful compile.
 
-Validation in the editing environment: the PlatformIO configuration was checked.
-After fixing serial include order and the XYZ relative-mode array, the ESP32-S3
-HAL sources compile. The full build currently stops because PlatformIO fails to
-install TMCStepper, leaving `TMCStepper.h` unavailable. No complete firmware
-binary or hardware validation is available.
+TMCStepper 0.7.3 is an explicit dependency, fetched from its upstream GitHub
+release archive so dependency installation doesn't require the PlatformIO
+library registry.
+
+Validation: `pio run -e esp32_s3_mini_1_n8` succeeds and generates
+`.pio/build/esp32_s3_mini_1_n8/firmware.bin`. Reported usage is 22,172 bytes RAM
+and 364,809 bytes flash. Firmware has not been uploaded or tested on hardware.
+
+If USB disappears after running an older build, close serial monitors, hold
+BOOT, press and release RESET, then release BOOT. Select the COM port that
+appears in Windows and upload the corrected build. If Windows retains an
+unresponsive port, unplug and reconnect the USB data cable while holding BOOT.
+
+## USB startup diagnosis
+
+The monitor explicitly sets DTR=0 and RTS=0 to avoid requesting reset/download
+mode, and uses LF command termination. Restart an already open monitor after
+changing these options. A COM port can also be the ROM downloader: its presence
+alone does not establish that Marlin is running.
+
+The separate `esp32_s3_mini_1_n8_usb_diagnostic` environment builds a standalone
+USB heartbeat and byte-echo program. It keeps the motor enable inactive and does
+not initialize the TMC UART or I2C. This diagnostic is not Marlin and cannot move
+the Z axis. Build it with `pio run -e esp32_s3_mini_1_n8_usb_diagnostic` and upload
+with the same environment plus `-t upload`. It should print a running message
+once per second and echo input. The normal Marlin environment remains
+`esp32_s3_mini_1_n8`.
+
+Hardware investigation: the application, bootloader, and partition table were
+read back and matched the local Marlin build; flash identification confirmed
+8 MB quad flash. ROM communication worked, but M115 did not answer. Following a
+full power cycle, Windows did not enumerate the USB device. The diagnostic
+environment compiles successfully but has not yet been flashed or tested.

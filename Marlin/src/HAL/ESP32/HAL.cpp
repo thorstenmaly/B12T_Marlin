@@ -118,6 +118,16 @@ struct {
 
 #endif
 
+#if MB(ESP32_S3_MINI_1_N8)
+  void MarlinHAL::init() {
+    // tmc_serial_begin() runs before init_board(). UART2's S3 defaults are
+    // GPIO19/20, which disconnect native USB if used even temporarily.
+    // Arduino supports setting pins before begin(); the TMC code then supplies
+    // its configured baud rate while retaining GPIO18 RX / GPIO17 TX.
+    Serial2.setPins(HARDWARE_SERIAL2_RX, HARDWARE_SERIAL2_TX);
+  }
+#endif
+
 void MarlinHAL::init_board() {
   #if ENABLED(USE_ESP32_TASK_WDT)
     esp_task_wdt_init(10, true);
@@ -145,7 +155,7 @@ void MarlinHAL::init_board() {
       Serial1.begin(BAUDRATE, SERIAL_8N1, HARDWARE_SERIAL1_RX, HARDWARE_SERIAL1_TX);
     #endif
   #endif
-  #if defined(HARDWARE_SERIAL2_RX) && defined(HARDWARE_SERIAL2_TX)
+  #if defined(HARDWARE_SERIAL2_RX) && defined(HARDWARE_SERIAL2_TX) && !MB(ESP32_S3_MINI_1_N8)
     // Use the persistent Arduino Serial2 instance (also used by TMCStepper).
     #ifdef TMC_BAUD_RATE  // use TMC_BAUD_RATE for Serial1 if defined
       Serial2.begin(TMC_BAUD_RATE, SERIAL_8N1, HARDWARE_SERIAL2_RX, HARDWARE_SERIAL2_TX);
