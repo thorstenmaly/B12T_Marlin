@@ -13,11 +13,15 @@ no PSRAM, and the native USB Serial/JTAG interface.
 | Z enable (active low) | 21 |
 | Z DIAG / sensorless home | 16 |
 | TMC2209 UART TX / RX | 17 / 18 |
-| AUX1 G-code RX / AUX2 G-code TX | 14 / 13 |
+| G-code RX: SDA (replaces AUX1) | 8 |
+| G-code TX: SCL (replaces AUX2) | 9 |
 | USB D- / D+ | 19 / 20 |
 
-AUX uses UART1 at 115200 baud, 8N1. Connect the host TX to AUX1,
-host RX to AUX2, and ground to ground; use 3.3 V logic.
+The host UART uses UART1 at 115200 baud, 8N1 on the former I2C connector J5.
+Connect host TX to SDA / GPIO8 (RX, replacing AUX1), host RX to SCL / GPIO9
+(TX, replacing AUX2), and ground to ground; use 3.3 V logic. The original J6
+AUX pins (GPIO14 / GPIO13) are no longer used for host UART communication.
+SDA and SCL are used as UART GPIOs; the Hall sensor and I2C remain unused.
 USB is a second Marlin G-code interface, as well as the flashing interface.
 Normal Marlin parsing and reply routing handle both ports. Coordinate commands
 from both hosts share one motion planner and one position; coordinate the hosts
@@ -29,7 +33,7 @@ Marlin starts the TMC UART. S3 UART2 defaults to GPIO19/20, so allowing a defaul
 UART2 initialization first would disconnect native USB.
 The driver address is 0: leave the MS1/MS2 jumpers open. The current calculation
 uses the schematic's 0.10 ohm sense resistors. The existing Z settings are
-retained: 240 mA RMS, 16 microsteps, 5249.3438 steps/mm, 4 mm/s maximum,
+configured: 240 mA RMS, 16 microsteps, 3200 steps/mm, 4 mm/s maximum,
 100 mm/s^2 maximum acceleration, and 0..8 mm travel. These are mechanism-specific
 values inherited from this project, not values inferred from the ESP32-S3 Mini 1 N8 controller.
 

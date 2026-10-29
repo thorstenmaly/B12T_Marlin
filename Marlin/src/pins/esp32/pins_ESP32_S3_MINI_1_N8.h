@@ -60,9 +60,11 @@
 #define HARDWARE_SERIAL2_RX 18
 #define Z_SLAVE_ADDRESS 0 // MS1 / MS2 jumpers open (internal pulldowns).
 
-// Host UART1 on J6: AUX1 = RX, AUX2 = TX. USB uses GPIO19 / GPIO20.
-#define AUX1 14
-#define AUX2 13
+// Host UART1 on J5: SDA replaces AUX1 (RX), SCL replaces AUX2 (TX).
+// These pins are used as UART GPIOs; the Hall sensor / I2C bus is not initialized.
+// USB uses GPIO19 / GPIO20.
+#define AUX1 8
+#define AUX2 9
 #define ESP32_HOST_RX_PIN AUX1
 #define ESP32_HOST_TX_PIN AUX2
 

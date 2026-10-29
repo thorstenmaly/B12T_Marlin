@@ -79,7 +79,7 @@
  *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-#define SERIAL_PORT 1 // AUX1 RX = GPIO14, AUX2 TX = GPIO13
+#define SERIAL_PORT 1 // RX = SDA / GPIO8 (replaces AUX1), TX = SCL / GPIO9 (replaces AUX2)
 
 /**
  * Serial Port Baud Rate
@@ -116,7 +116,7 @@
 //#define BLUETOOTH
 
 // Name displayed in the LCD "Ready" message and Info menu
-#define CUSTOM_MACHINE_NAME "B12T Stepper Motor Controller"
+#define CUSTOM_MACHINE_NAME "Bruker Stepper Motor Controller"
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like https://www.uuidgenerator.net/version4
@@ -1234,22 +1234,14 @@
  * Override with M92
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-<<<<<<< HEAD
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 800, 5249.3438, 5249.3438 } // X is rotational
-=======
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 800, 5249.3438, 3200, 5249.3438 } // X is rotational; Z: 200 steps/rev * 16 microsteps / 1 mm lead
->>>>>>> B12T_develop
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 800, 5249.3438, 3200 } // X is rotational; Z: 3200 steps/mm
 
 /**
  * Default Max Feed Rate (linear=mm/s, rotational=°/s)
  * Override with M203
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-<<<<<<< HEAD
 #define DEFAULT_MAX_FEEDRATE          { 10, 4, 4 } // X Maximum 15
-=======
-#define DEFAULT_MAX_FEEDRATE          { 10, 4, 1, 4 } // X Maximum 15
->>>>>>> B12T_develop
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -1262,11 +1254,7 @@
  * Override with M201
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-<<<<<<< HEAD
 #define DEFAULT_MAX_ACCELERATION      { 100, 100, 100 }
-=======
-#define DEFAULT_MAX_ACCELERATION      { 100, 100, 5, 10000 }
->>>>>>> B12T_develop
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)

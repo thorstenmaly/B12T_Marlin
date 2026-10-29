@@ -46,7 +46,7 @@
 /**
  * Defines a generic printer name to be output to the LCD after booting Marlin.
  */
-#define MACHINE_NAME "B12T Stepper Motor Controller"
+#define MACHINE_NAME "Bruker Stepper Motor Controller"
 
 /**
  * The SOURCE_CODE_URL is the location where users will find the Marlin Source
