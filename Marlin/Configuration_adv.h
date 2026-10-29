@@ -3010,7 +3010,7 @@
 
   #if AXIS_IS_TMC_CONFIG(Z)
     #define Z_CURRENT       240
-    #define Z_CURRENT_HOME  Z_CURRENT * 2
+    #define Z_CURRENT_HOME  Z_CURRENT
     #define Z_MICROSTEPS     16
     #define Z_RSENSE          0.10 // ESP32-S3 Mini 1 N8 controller R6 / R7: 100 milliohm
     #define Z_CHAIN_POS      -1

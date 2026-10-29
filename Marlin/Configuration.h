@@ -1234,14 +1234,22 @@
  * Override with M92
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
+<<<<<<< HEAD
 #define DEFAULT_AXIS_STEPS_PER_UNIT   { 800, 5249.3438, 5249.3438 } // X is rotational
+=======
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 800, 5249.3438, 3200, 5249.3438 } // X is rotational; Z: 200 steps/rev * 16 microsteps / 1 mm lead
+>>>>>>> B12T_develop
 
 /**
  * Default Max Feed Rate (linear=mm/s, rotational=°/s)
  * Override with M203
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
+<<<<<<< HEAD
 #define DEFAULT_MAX_FEEDRATE          { 10, 4, 4 } // X Maximum 15
+=======
+#define DEFAULT_MAX_FEEDRATE          { 10, 4, 1, 4 } // X Maximum 15
+>>>>>>> B12T_develop
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -1254,7 +1262,11 @@
  * Override with M201
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
+<<<<<<< HEAD
 #define DEFAULT_MAX_ACCELERATION      { 100, 100, 100 }
+=======
+#define DEFAULT_MAX_ACCELERATION      { 100, 100, 5, 10000 }
+>>>>>>> B12T_develop
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
@@ -1734,7 +1746,7 @@
 // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
 #define INVERT_X_DIR true
 #define INVERT_Y_DIR true
-#define INVERT_Z_DIR true
+#define INVERT_Z_DIR false
 //#define INVERT_I_DIR false
 //#define INVERT_J_DIR false
 //#define INVERT_K_DIR false
